@@ -65,12 +65,13 @@ const createPlaces = (req, res, next) => {
   const createdPlaces = {
     title,
     description,
+    imageUrl,
     location: coordinates,
     address,
     creator,
   };
-  PLACES.push(createPlaces);
-  res.status(201);
+  PLACES.push(createdPlaces);
+  res.status(201).json({ place: createdPlaces });
 };
 
 exports.getPlacesByPid = getPlacesByPid; // Passing pointer of functions instead of functions
