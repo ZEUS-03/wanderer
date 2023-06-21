@@ -8,9 +8,13 @@ const app = express();
 
 const placesRouter = require("./routes/places-routes");
 
+const usersRouter = require("./routes/users-routes");
+
 app.use(bodyParser.json());
 
 app.use("/api/places", placesRouter);
+
+app.use("/api/users", usersRouter);
 
 // Any path other than the above will then leads to run the below middleware.
 // The below middleware will only gets executed when any response is not sent.

@@ -1,5 +1,7 @@
 const HttpError = require("../models/http-errors");
 
+const { validationResult } = require("express-validator");
+
 let PLACES = [
   {
     id: "p1",
@@ -47,19 +49,25 @@ const getPlacesByPid = (req, res, next) => {
 
 const getPlacesByUid = (req, res, next) => {
   const uid = req.params.uid;
-  const place = PLACES.find((p) => {
+  const places = PLACES.filter((p) => {
     return p.creator === uid;
   });
-  if (!place) {
+  if (!places || places.length === 0) {
     throw new HttpError(
       "Path is not valid... Please enter a valid pathname.",
       404
     );
   }
-  res.json({ place });
+  res.json({ places });
 };
 
 const createPlaces = (req, res, next) => {
+  const error = validationResult(req);
+
+  if (!error.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data!", 422);
+  }
+
   const { title, description, imageUrl, address, coordinates, creator } =
     req.body;
   const createdPlaces = {
@@ -77,6 +85,12 @@ const createPlaces = (req, res, next) => {
 const updatePlace = (req, res, next) => {
   const { title, description } = req.body;
   const placeid = req.params.pid;
+
+  const error = validationResult(req);
+
+  if (!error.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data!", 422);
+  }
 
   const updatedPlace = { ...PLACES.find((p) => p.id === placeid) }; // not directly updating the PLACE as if any error occured it may cause the unnecessary modification.
   const placeIndex = PLACES.findIndex((p) => p.id === placeid);
