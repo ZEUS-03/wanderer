@@ -1,4 +1,5 @@
 const HttpError = require("../models/http-errors");
+const getCoordsForAddr = require("../utils/location");
 
 const { validationResult } = require("express-validator");
 
@@ -9,10 +10,6 @@ let PLACES = [
     description: "One of the most famous sky scrapers in the world!",
     imageUrl: "https://media.timeout.com/images/101705309/image.jpg",
     address: "20 W 34th st, New York, NY 100011",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
     creator: "u1",
   },
   {
@@ -21,10 +18,6 @@ let PLACES = [
     description: "One of the most famous sky scrapers in the world!",
     imageUrl: "https://media.timeout.com/images/101705309/image.jpg",
     address: "20 W 34th st, New York, NY 100011",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
     creator: "u2",
   },
 ];
@@ -61,15 +54,22 @@ const getPlacesByUid = (req, res, next) => {
   res.json({ places });
 };
 
-const createPlaces = (req, res, next) => {
+const createPlaces = async (req, res, next) => {
   const error = validationResult(req);
 
   if (!error.isEmpty()) {
-    throw new HttpError("Invalid inputs passed, please check your data!", 422);
+    next(new HttpError("Invalid inputs passed, please check your data!", 422));
   }
 
-  const { title, description, imageUrl, address, coordinates, creator } =
+  const { title, description, imageUrl, address, coordinate, creator } =
     req.body;
+  let coordinates;
+  try {
+    coordinates = await getCoordsForAddr(address);
+  } catch (error) {
+    return next(error);
+  }
+
   const createdPlaces = {
     title,
     description,
