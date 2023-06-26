@@ -2,6 +2,8 @@ const express = require("express");
 
 const bodyParser = require("body-parser");
 
+const mongoose = require("mongoose");
+
 const HttpError = require("./models/http-errors");
 
 const app = express();
@@ -23,12 +25,21 @@ app.use((req, res, next) => {
   throw new HttpError("Path is not defined!", 404);
 });
 
-app.listen(3000);
-
 app.use((err, req, res, next) => {
   if (res.headerSent) {
     return next(err);
   }
-  res.status(err.code);
+  res.status(err.code || 500);
   res.json(err.message || { message: "An unknown error occured!" });
 });
+
+mongoose
+  .connect(
+    "mongodb+srv://gauti:9K3WeeDiXcRgfRck@cluster0.1f58ngu.mongodb.net/place?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

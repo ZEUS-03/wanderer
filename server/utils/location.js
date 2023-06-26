@@ -19,7 +19,7 @@ async function getCoordsForAddr(address) {
   const response = await axios.request(options);
   const data = response.data;
 
-  if (data.isEmpty()) {
+  if (data === {}) {
     throw new HttpError("Please enter a valid address!", 404);
   }
   const coordinates = { lng: data[0].lon, lat: data[0].lat };

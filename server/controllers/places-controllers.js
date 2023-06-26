@@ -1,5 +1,7 @@
 const HttpError = require("../models/http-errors");
 const getCoordsForAddr = require("../utils/location");
+const Place = require("../models/Place");
+const mongoose = require("mongoose");
 
 const { validationResult } = require("express-validator");
 
@@ -22,43 +24,57 @@ let PLACES = [
   },
 ];
 
-const getPlacesByPid = (req, res, next) => {
+const getPlacesByPid = async (req, res, next) => {
   const pid = req.params.pid;
-  const place = PLACES.find((p) => {
-    return p.id === pid;
-  });
+  let place;
+  try {
+    place = await Place.findById(pid);
+  } catch (error) {
+    const err = new HttpError(
+      "Something went wrong! can not find a place!",
+      500
+    );
+    return next(err);
+  }
   if (!place) {
-    throw new HttpError(
+    const error = new HttpError(
       "Path is not valid... Please enter a valid pathname.",
       404
     );
-
+    return next(error);
     // const err = new Error("Path is invalid!");
     // err.code = 404;
     // return next(err);
   }
-  res.json({ place });
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
-const getPlacesByUid = (req, res, next) => {
+const getPlacesByUid = async (req, res, next) => {
   const uid = req.params.uid;
-  const places = PLACES.filter((p) => {
-    return p.creator === uid;
-  });
+  let places;
+  try {
+    places = await Place.find({ creator: uid });
+  } catch (err) {
+    const error = new HttpError("Failed to get any place.", 500);
+    return next(error);
+  }
   if (!places || places.length === 0) {
-    throw new HttpError(
+    const error = new HttpError(
       "Path is not valid... Please enter a valid pathname.",
       404
     );
+    return next(error);
   }
-  res.json({ places });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 
 const createPlaces = async (req, res, next) => {
   const error = validationResult(req);
 
   if (!error.isEmpty()) {
-    next(new HttpError("Invalid inputs passed, please check your data!", 422));
+    next(new HttpError("Invalid inputs passed, please check your data!", 404));
   }
 
   const { title, description, imageUrl, address, coordinate, creator } =
@@ -70,37 +86,63 @@ const createPlaces = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlaces = {
+  const createdPlaces = new Place({
     title,
     description,
-    imageUrl,
+    image: "https://media.timeout.com/images/101705309/image.jpg",
     location: coordinates,
     address,
     creator,
-  };
-  PLACES.push(createdPlaces);
+  });
+  try {
+    await createdPlaces.save();
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError("Can't add new place.", 404);
+    return next(error);
+  }
+
   res.status(201).json({ place: createdPlaces });
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const { title, description } = req.body;
   const placeid = req.params.pid;
+  let place;
 
   const error = validationResult(req);
 
   if (!error.isEmpty()) {
-    throw new HttpError("Invalid inputs passed, please check your data!", 422);
+    const error = new HttpError(
+      "Invalid inputs passed, please check your data!",
+      422
+    );
+    return next(error);
   }
 
-  const updatedPlace = { ...PLACES.find((p) => p.id === placeid) }; // not directly updating the PLACE as if any error occured it may cause the unnecessary modification.
-  const placeIndex = PLACES.findIndex((p) => p.id === placeid);
+  try {
+    place = await Place.findById(placeid);
+  } catch (err) {
+    const error = new HttpError(
+      "Can't update the existing field! Try again later.",
+      500
+    );
+    return next(error);
+  }
 
-  updatedPlace.title = title;
-  updatedPlace.description = description;
-  // once the update is finishied then only it's preferred to update the PLACES variable.
-  PLACES[placeIndex] = updatedPlace;
+  place.title = title;
+  place.description = description;
 
-  res.status(200).json({ place: updatedPlace });
+  try {
+    await place.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong! Can't update place!",
+      500
+    );
+  }
+
+  res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
 const deletePlace = (req, res, next) => {
