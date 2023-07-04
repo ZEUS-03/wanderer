@@ -1,5 +1,5 @@
-import React, { useReducer } from "react";
-import { validate } from "../utils/validators";
+import React, { useReducer, useEffect } from "react";
+import { validate } from "../../utils/validators";
 
 const inputReducer = (state, action) => {
   switch (action.type) {
@@ -18,13 +18,19 @@ const inputReducer = (state, action) => {
       return state;
   }
 };
-
 const Input = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: "",
     isTouched: false,
     isValid: false,
   });
+
+  const { isValid, value } = inputState;
+  const { id, onInput } = props;
+
+  useEffect(() => {
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
 
   const changeHandler = (event) => {
     dispatch({
