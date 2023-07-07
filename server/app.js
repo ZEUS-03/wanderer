@@ -1,4 +1,4 @@
-const URI = require("./utils/config");
+const constants = require("./utils/config");
 
 const express = require("express");
 
@@ -36,9 +36,7 @@ app.use((err, req, res, next) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://gauti:9K3WeeDiXcRgfRck@cluster0.1f58ngu.mongodb.net/place?retryWrites=true&w=majority"
-  )
+  .connect(constants.MONGO_URL)
   .then(() => {
     app.listen(3000);
   })

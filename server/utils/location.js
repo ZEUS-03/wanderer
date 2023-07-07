@@ -1,5 +1,6 @@
 const axios = require("axios");
 const HttpError = require("../models/http-errors");
+const constants = require("./config");
 
 async function getCoordsForAddr(address) {
   const options = {
@@ -11,7 +12,7 @@ async function getCoordsForAddr(address) {
       polygon_threshold: "0.0",
     },
     headers: {
-      "X-RapidAPI-Key": "33d15553dbmsh5667d32b0b183fbp149dcbjsnc83c544639fc",
+      "X-RapidAPI-Key": constants.rapid_api,
       "X-RapidAPI-Host": "forward-reverse-geocoding.p.rapidapi.com",
     },
   };

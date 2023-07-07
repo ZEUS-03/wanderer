@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import { rapid_api } from "../constant";
 
 const Map = (props) => {
   const mapContainer = useRef(null);
@@ -10,12 +11,9 @@ const Map = (props) => {
       12
     );
 
-    L.tileLayer(
-      "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=b68510c535msh23ff626d36ca4f3p17d5aejsn4c63ec837620",
-      {
-        maxZoom: 19,
-      }
-    ).addTo(map);
+    L.tileLayer(rapid_api, {
+      maxZoom: 19,
+    }).addTo(map);
 
     const marker = L.marker([center.lat, center.lng]).addTo(map);
   }, []);
