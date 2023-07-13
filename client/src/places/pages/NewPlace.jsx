@@ -5,6 +5,7 @@ import {
 } from "../../shared/utils/validators";
 
 import Input from "../../shared/components/FormElements/Input";
+import Button from "../../shared/components/FormElements/Button";
 
 const formReducer = (state, action) => {
   switch (action.type) {
@@ -14,7 +15,7 @@ const formReducer = (state, action) => {
         if (inputId === action.inputId) {
           formIsValid = formIsValid && action.isValid;
         } else {
-          formIsValid = formIsValid && state.imputs[inputId].isValid;
+          formIsValid = formIsValid && state.inputs[inputId].isValid;
         }
       }
       return {
@@ -54,8 +55,16 @@ const NewPlace = (props) => {
     });
   }, []);
 
+  const placeSubmit = (event) => {
+    event.preventDefault();
+    console.log(formState.inputs);
+  };
+
   return (
-    <form className="rounded-md p-3 w-[50%] mx-auto bg-[#fde2cd] mt-3 shadow-md">
+    <form
+      className="rounded-md p-3 w-[50%] mx-auto bg-[#fde2cd] mt-3 shadow-md"
+      onSubmit={placeSubmit}
+    >
       <Input
         id="title"
         element="input"
@@ -73,6 +82,17 @@ const NewPlace = (props) => {
         errorText="Please enter a valid Description (at least 5 characters)."
         onInput={inputHandler}
       />
+      <Input
+        id="address"
+        element="input"
+        label="Address"
+        validators={[VALIDATOR_REQUIRE()]}
+        errorText="Please enter a valid Address."
+        onInput={inputHandler}
+      />
+      <Button type="submit" disabled={!formState.isValid}>
+        Add Place
+      </Button>
     </form>
   );
 };

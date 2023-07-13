@@ -20,9 +20,9 @@ const inputReducer = (state, action) => {
 };
 const Input = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: "",
+    value: props.value || "",
     isTouched: false,
-    isValid: false,
+    isValid: props.valid || false,
   });
 
   const { isValid, value } = inputState;
@@ -75,6 +75,11 @@ const Input = (props) => {
           onBlur={touchHandler}
           onChange={changeHandler}
           value={inputState.value}
+          className={`border border-gray-500 rounded-sm focus:bg-gray-100 px-[3px] ${
+            !inputState.isValid &&
+            inputState.isTouched &&
+            "border-2 border-red-500"
+          }`}
         />
       )}
       {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
