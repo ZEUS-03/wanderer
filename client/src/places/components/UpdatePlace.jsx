@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import { useForm } from "../../shared/hooks/form-hook";
+import Card from "../../shared/components/Card";
 
 import {
   VALIDATOR_REQUIRE,
@@ -12,7 +13,7 @@ import {
 const DUMMY_DATA = [
   {
     id: "p1",
-    title: "Empire State Building",
+    title: "Emp. State Building",
     description: "One of the most famous sky scrapers in the world!",
     imageUrl: "https://media.timeout.com/images/101705309/image.jpg",
     address: "20 W 34th st, New York, NY 100011",
@@ -56,19 +57,22 @@ const UpdatePlace = () => {
   );
 
   useEffect(() => {
-    setFormData(
-      {
-        title: {
-          value: identifiedPlace.title,
-          isValid: true,
+    if (identifiedPlace) {
+      setFormData(
+        {
+          title: {
+            value: identifiedPlace.title,
+            isValid: true,
+          },
+          description: {
+            value: identifiedPlace.description,
+            isValid: true,
+          },
         },
-        description: {
-          value: identifiedPlace.description,
-          isValid: true,
-        },
-      },
-      true
-    );
+        true
+      );
+    }
+
     setIsLoading(false);
   }, [setFormData, identifiedPlace]);
 
@@ -79,9 +83,9 @@ const UpdatePlace = () => {
 
   if (!identifiedPlace) {
     return (
-      <h1 className="text-center mt-3 font-semibold text-xl">
-        Place not found!
-      </h1>
+      <Card>
+        <h1 className="text-center font-bold text-xl">Place not found!</h1>
+      </Card>
     );
   }
 

@@ -1,17 +1,17 @@
 import React from "react";
 import PlacesItem from "./PlacesItem";
+import Button from "../../shared/components/FormElements/Button";
+import Card from "../../shared/components/Card";
 
 const PlacesList = (props) => {
   if (props.items.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center bg-orange-200 my-3 w-[40%] mx-auto p-3 rounded-lg ">
-        <h1 className="text-xl font-bold">
+      <Card>
+        <h1 className="text-xl font-bold mb-3">
           No places found for the user! Maybe create one?
         </h1>
-        <button className="bg-orange-400 p-1 my-2 rounded-lg hover:bg-orange-300">
-          Share Place
-        </button>
-      </div>
+        <Button to="/places/new">Share Place</Button>
+      </Card>
     );
   }
   return (

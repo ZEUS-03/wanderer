@@ -2,13 +2,25 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Modal from "../../shared/components/Modal";
 import Map from "../../shared/components/Map";
+import Button from "../../shared/components/FormElements/Button";
 
 const PlacesItem = (props) => {
   const [showMap, setShowMap] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const openMapHandler = () => setShowMap(true);
   const closeMapHandler = () => setShowMap(false);
 
+  const showDeleteWarningHandler = () => {
+    setShowConfirmModal(true);
+  };
+  const cancelDeleteHandler = () => {
+    setShowConfirmModal(false);
+  };
+  const confirmDeleteHandler = () => {
+    console.log("DELETED!");
+    setShowConfirmModal(false);
+  };
   return (
     <>
       <Modal
@@ -30,6 +42,35 @@ const PlacesItem = (props) => {
         <div className="w-[100%] h-[30vh]">
           <Map center={props.coordinates} />
         </div>
+      </Modal>
+      <Modal
+        show={showConfirmModal}
+        onCancel={cancelDeleteHandler}
+        className="fixed w-[80%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-lg  font-semibold text-lg bg-white z-20 border-2 border-black rounded-lg "
+        headerClass="font-semibold bg-orange-300 w-full text-lg rounded-t-md text-center p-2 "
+        header={"Are you sure?"}
+        footerClass="justify-center text-right my-2"
+        footer={
+          <>
+            <button
+              className="mr-3 px-3 py-1 border border-[#fe002f] bg-white hover:bg-[#fe002f] font-medium text-md text-[#fe002f] hover:text-white rounded-sm"
+              onClick={cancelDeleteHandler}
+            >
+              CANCEL
+            </button>
+            <button
+              className="mr-3 px-3 py-1 bg-[#b81c0e] hover:bg-[#fe002f] font-medium text-md text-white rounded-sm"
+              onClick={confirmDeleteHandler}
+            >
+              DELETE
+            </button>
+          </>
+        }
+      >
+        <p className="mx-3 py-7">
+          Do you really want to delete the place. Please note that once deleted,
+          the place will not be recovered!
+        </p>
       </Modal>
       <li className="w-[40%] rounded-md bg-[#fde2cd] m-3">
         <img
@@ -54,7 +95,10 @@ const PlacesItem = (props) => {
               EDIT
             </button>
           </Link>
-          <button className="mx-2 my-2 px-3 py-1 bg-[#b81c0e] hover:bg-[#fe002f] font-medium text-md text-white rounded-sm">
+          <button
+            className="mx-2 my-2 px-3 py-1 bg-[#b81c0e] hover:bg-[#fe002f] font-medium text-md text-white rounded-sm"
+            onClick={showDeleteWarningHandler}
+          >
             DELETE
           </button>
         </div>
