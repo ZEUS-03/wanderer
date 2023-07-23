@@ -1,6 +1,9 @@
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { Authcontext } from "../context/auth-context";
 
 const NavLinks = (props) => {
+  const { isLoggedIn } = useContext(Authcontext);
   const navLinkStyles = ({ isActive }) => {
     return {
       fontWeight: isActive ? "600" : "normal",
@@ -14,15 +17,21 @@ const NavLinks = (props) => {
       <NavLink to={"/"} style={navLinkStyles} exact="true">
         <li className=" list-none p-2 ">All Users</li>
       </NavLink>
-      <NavLink to={"/u1/places"} style={navLinkStyles}>
-        <li className=" list-none p-2  ">My Places</li>
-      </NavLink>
-      <NavLink to={"/places/new"} style={navLinkStyles}>
-        <li className=" list-none p-2  ">Add Places</li>
-      </NavLink>
-      <NavLink to={"/auth"} style={navLinkStyles}>
-        <li className=" list-none p-2 ">Authenticate</li>
-      </NavLink>
+      {isLoggedIn && (
+        <NavLink to={":userId/places"} style={navLinkStyles}>
+          <li className=" list-none p-2  ">My Places</li>
+        </NavLink>
+      )}
+      {isLoggedIn && (
+        <NavLink to={"/places/new"} style={navLinkStyles}>
+          <li className=" list-none p-2  ">Add Places</li>
+        </NavLink>
+      )}
+      {!isLoggedIn && (
+        <NavLink to={"/auth"} style={navLinkStyles}>
+          <li className=" list-none p-2 ">Authenticate</li>
+        </NavLink>
+      )}
     </>
   );
 };
