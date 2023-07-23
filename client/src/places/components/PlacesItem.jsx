@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import Modal from "../../shared/components/Modal";
 import Map from "../../shared/components/Map";
 import Button from "../../shared/components/FormElements/Button";
 
+import { Authcontext } from "../../shared/context/auth-context";
+
 const PlacesItem = (props) => {
+  const { isLoggedIn } = useContext(Authcontext);
+
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -90,17 +94,21 @@ const PlacesItem = (props) => {
           >
             VIEW ON MAP
           </button>
-          <Link to={`places/${props.id}`}>
-            <button className="mx-2 my-2 px-3 py-1 bg-[#FF8800] hover:bg-[#ffaa49] font-medium text-md text-white rounded-sm">
-              EDIT
+          {isLoggedIn && (
+            <Link to={`places/${props.id}`}>
+              <button className="mx-2 my-2 px-3 py-1 bg-[#FF8800] hover:bg-[#ffaa49] font-medium text-md text-white rounded-sm">
+                EDIT
+              </button>
+            </Link>
+          )}
+          {isLoggedIn && (
+            <button
+              className="mx-2 my-2 px-3 py-1 bg-[#b81c0e] hover:bg-[#fe002f] font-medium text-md text-white rounded-sm"
+              onClick={showDeleteWarningHandler}
+            >
+              DELETE
             </button>
-          </Link>
-          <button
-            className="mx-2 my-2 px-3 py-1 bg-[#b81c0e] hover:bg-[#fe002f] font-medium text-md text-white rounded-sm"
-            onClick={showDeleteWarningHandler}
-          >
-            DELETE
-          </button>
+          )}
         </div>
       </li>
     </>
