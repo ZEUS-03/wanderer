@@ -20,7 +20,7 @@ const Auth = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  const [error, setError] = useState(null);
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -60,10 +60,31 @@ const Auth = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
+    setIsLoading(true);
     if (isLoginMode) {
+      try {
+        const response = await fetch("http://localhost:3000/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+        });
+        const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.message);
+        }
+        setIsLoading(false);
+        auth.login();
+      } catch (e) {
+        setIsLoading(false);
+        setError(e.message || "Something went wrong!");
+      }
     } else {
       try {
-        setIsLoading(true);
         const response = await fetch("http://localhost:3000/api/users/signup", {
           method: "POST",
           headers: {
@@ -76,7 +97,7 @@ const Auth = () => {
           }),
         });
         const responseData = await response.json();
-        if (!responseData.ok) {
+        if (!response.ok) {
           throw new Error(responseData.message);
         }
         setIsLoading(false);
@@ -85,18 +106,18 @@ const Auth = () => {
       } catch (e) {
         console.log(e);
         setIsLoading(false);
-        setError(e.message) || "Something went wrong!";
+        setError(e.message || "Something went wrong!");
       }
     }
   };
 
   const errorHandler = () => {
-    setError();
+    setError(null);
   };
 
   return (
     <>
-      {!!error ? (
+      {error ? (
         <ErrorModal message={error} onClose={errorHandler} />
       ) : (
         <Card>
